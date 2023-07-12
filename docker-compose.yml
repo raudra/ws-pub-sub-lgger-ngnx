@@ -1,0 +1,70 @@
+version: "3.7"
+services:
+  server:
+    build: ./server 
+    container_name: nginx-base
+    ports:
+      - 80:80
+    depends_on:
+      - log 
+
+  cache:
+    image: redis:6.2-alpine
+    container_name: redis_cache
+    restart: always
+    ports:
+      - '6300:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+  db:
+    image: postgres:10.5
+    container_name: pg_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5435:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  profile:
+    build: ./profile-service
+    container_name: profile-service
+    ports:
+      - 9000:8080
+    depends_on:
+      - db
+      - cache
+      - server
+  otp:
+    build: ./otp-service
+    container_name: otp-service
+    ports:
+      - 9001:8080  
+    depends_on:
+      - cache
+      - profile
+      - server
+
+  auth:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - 9003:8080  
+    depends_on:
+      - cache
+      
+  log:
+    build: ./log-server
+    container_name: log-service
+    ports:
+      - 9002:8000
+
+    depends_on:
+      - cache
+
+volumes:
+  cache:
+  postgres_data:
+  

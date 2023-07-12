@@ -1,0 +1,59 @@
+<html>
+  <div id="test">
+    <pre id="output"></pre>
+  </div>
+  <style>
+    html {
+      text-align: center;
+      font-size: 16px;
+    }
+    div {
+      padding: 1rem;
+    }
+    #input {
+      font-size: 16px;
+    }
+    p {
+        font-size: 16px;
+    }
+  </style>
+  <script>
+
+		var output = document.getElementById("output");
+		output.innerHTML += "Status: Connected\n";
+		function start(){
+						var socket = new WebSocket("ws://test-whtapp.com/ws?id=1&&name=raudra");
+		
+						socket.onopen = function () {
+							//	output.innerHTML += "Status: Connected\n";
+							console.log("websocket connected")
+						};
+
+						socket.onclose = function(){
+							console.log("disconnected web socket")
+							socket = null
+			        setTimeout(function(){start()}, 5000);
+						};
+    				socket.onmessage = function (e) {
+										console.log(e.data.split("\n"))
+										var table = document.createElement('table')
+										var tr = document.createElement('tr')
+										var tr1 = document.createElement('tr')
+										var td = document.createElement('td')
+										var td1 = document.createElement('td')
+										td.innerHTML = 'Service: '
+										td.innerHTML += JSON.parse(e.data)['service']
+										tr.appendChild(td)
+										
+										td1.innerHTML = 'Payload: '
+										td1.innerHTML +=  JSON.stringify(JSON.parse(e.data)['payload'])
+										tr1.appendChild(td1)
+										table.appendChild(tr)	
+										table.appendChild(tr1)
+										document.getElementById("output").appendChild(table)
+										document.getElementById("output").innerHTML +="<br>"
+    		};
+	}
+	start()
+  </script>
+</html>

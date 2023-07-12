@@ -1,0 +1,10 @@
+version: "3.3"
+
+services:
+  rate-limitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: profile-service
+    ports:
+      - 9000:8080  

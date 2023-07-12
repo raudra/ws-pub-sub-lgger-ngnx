@@ -1,0 +1,10 @@
+version: "3.3"
+
+services:
+  rate-limitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: session-service
+    ports:
+      - 9001:8080  
